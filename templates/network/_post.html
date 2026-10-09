@@ -1,0 +1,43 @@
+<article class="post" id="post-{{ post.pk }}">
+  <a href="{% url 'profile' post.author.username %}" tabindex="-1">{% include "network/_avatar.html" with u=post.author size="md" %}</a>
+  <div class="post-main">
+    <header class="post-head">
+      <a class="who" href="{% url 'profile' post.author.username %}">{{ post.author.username }}</a>
+      <a class="when muted" href="{% url 'post_detail' post.pk %}"><time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|timesince }} ago</time></a>
+    </header>
+
+    {% if post.content %}<p class="post-body">{{ post.content|linebreaksbr }}</p>{% endif %}
+    {% if post.image %}<img class="post-image" src="{{ post.image.url }}" alt="Image posted by {{ post.author.username }}" loading="lazy">{% endif %}
+
+    <footer class="post-actions">
+      {% if user.is_authenticated %}
+      <form method="post" action="{% url 'like_toggle' post.pk %}" class="js-like">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="act act-like{% if post.liked_by_me %} is-on{% endif %}" aria-pressed="{% if post.liked_by_me %}true{% else %}false{% endif %}" aria-label="Like">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+          <span class="count">{{ post.like_count }}</span>
+        </button>
+      </form>
+      {% else %}
+      <a class="act act-like" href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}" aria-label="Log in to like">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <span class="count">{{ post.like_count }}</span>
+      </a>
+      {% endif %}
+
+      <a class="act" href="{% url 'post_detail' post.pk %}#comments" aria-label="Comments">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>{{ post.comment_count }}</span>
+      </a>
+
+      {% if post.author == user %}
+      <form method="post" action="{% url 'post_delete' post.pk %}" class="push-right" onsubmit="return confirm('Delete this post?');">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{% if detail %}{% url 'feed' %}{% else %}{{ request.get_full_path }}{% endif %}">
+        <button type="submit" class="link-btn">Delete</button>
+      </form>
+      {% endif %}
+    </footer>
+  </div>
+</article>

@@ -1,0 +1,14 @@
+<div class="user-card">
+  <a class="user-card-main" href="{% url 'profile' person.username %}">
+    {% include "network/_avatar.html" with u=person size="md" %}
+    <span class="user-card-text">
+      <strong>{{ person.username }}</strong>
+      {% if person.profile.bio %}<span class="muted">{{ person.profile.bio|truncatechars:90 }}</span>{% endif %}
+    </span>
+  </a>
+  {% if person.pk in my_following_ids %}
+    {% include "network/_follow_button.html" with person=person is_following=True %}
+  {% else %}
+    {% include "network/_follow_button.html" with person=person is_following=False %}
+  {% endif %}
+</div>

@@ -1,0 +1,65 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Tidepool{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+{% block layout %}
+<div class="shell">
+  <aside class="rail">
+    <a class="brand" href="{% url 'feed' %}">Tidepool</a>
+    <nav class="nav" aria-label="Main">
+      <a href="{% url 'feed' %}">Home</a>
+      <a href="{% url 'search' %}">Search</a>
+      {% if user.is_authenticated %}
+        <a href="{% url 'profile' user.username %}">Profile</a>
+        <a href="{% url 'profile_edit' %}">Edit profile</a>
+      {% endif %}
+    </nav>
+    <div class="rail-user">
+      {% if user.is_authenticated %}
+        {% include "network/_avatar.html" with u=user size="sm" %}
+        <span class="rail-name">{{ user.username }}</span>
+        <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="link-btn" type="submit">Log out</button></form>
+      {% else %}
+        <a class="btn btn-primary" href="{% url 'login' %}">Log in</a>
+        <a class="btn btn-quiet" href="{% url 'register' %}">Sign up</a>
+      {% endif %}
+    </div>
+  </aside>
+
+  <main class="column">
+    {% include "network/_messages.html" %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <aside class="side">
+    <form class="search" action="{% url 'search' %}" method="get" role="search">
+      <input type="search" name="q" placeholder="Search people and posts" aria-label="Search">
+    </form>
+    {% if user.is_authenticated and suggested_people %}
+    <section class="panel">
+      <h2>Who to follow</h2>
+      {% for person in suggested_people %}
+        <div class="mini-user">
+          <a class="mini-link" href="{% url 'profile' person.username %}">
+            {% include "network/_avatar.html" with u=person size="sm" %}
+            <span>{{ person.username }}</span>
+          </a>
+          {% include "network/_follow_button.html" with person=person is_following=False %}
+        </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}
+<script src="{% static 'js/app.js' %}" defer></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Sign up · Tidepool{% endblock %}
+{% block layout %}
+<main class="auth">
+  <a class="brand brand-lg" href="{% url 'feed' %}">Tidepool</a>
+  <p class="auth-lead">Create your account to post, comment, like and follow.</p>
+  <form class="form" method="post">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="field">
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {{ field }}
+      {% if field.help_text %}<p class="help muted">{{ field.help_text|safe }}</p>{% endif %}
+      {% for error in field.errors %}<p class="error">{{ error }}</p>{% endfor %}
+    </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary btn-block">Sign up</button>
+  </form>
+  <p class="muted auth-alt">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+</main>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% if page.has_other_pages %}
+<nav class="pager" aria-label="Pages">
+  {% if page.has_next %}<a class="btn btn-quiet" href="?{% if tab %}tab={{ tab }}&{% endif %}page={{ page.next_page_number }}">Older posts</a>{% endif %}
+  {% if page.has_previous %}<a class="btn btn-quiet" href="?{% if tab %}tab={{ tab }}&{% endif %}page={{ page.previous_page_number }}">Newer posts</a>{% endif %}
+</nav>
+{% endif %}

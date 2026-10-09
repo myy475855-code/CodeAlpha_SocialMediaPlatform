@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Post by {{ post.author.username }} · Tidepool{% endblock %}
+{% block content %}
+<header class="page-head"><h1>Post</h1></header>
+{% include "network/_post.html" with detail=True %}
+
+<section id="comments" class="comments">
+  <h2>Comments ({{ post.comment_count }})</h2>
+
+  {% if user.is_authenticated %}
+  <form class="comment-form" method="post" action="{% url 'comment_add' post.pk %}">
+    {% csrf_token %}
+    <label class="sr-only" for="{{ form.content.id_for_label }}">Comment</label>
+    {{ form.content }}
+    <button type="submit" class="btn btn-primary">Comment</button>
+  </form>
+  {% else %}
+  <p class="muted"><a href="{% url 'login' %}?next={{ request.get_full_path|urlencode }}">Log in</a> to comment.</p>
+  {% endif %}
+
+  {% for comment in comments %}
+  <div class="comment">
+    <a href="{% url 'profile' comment.author.username %}" tabindex="-1">{% include "network/_avatar.html" with u=comment.author size="sm" %}</a>
+    <div class="comment-main">
+      <div class="post-head">
+        <a class="who" href="{% url 'profile' comment.author.username %}">{{ comment.author.username }}</a>
+        <span class="muted">{{ comment.created_at|timesince }} ago</span>
+      </div>
+      <p>{{ comment.content }}</p>
+    </div>
+    {% if user == comment.author or user == post.author %}
+    <form method="post" action="{% url 'comment_delete' comment.pk %}" onsubmit="return confirm('Delete this comment?');">
+      {% csrf_token %}<button type="submit" class="link-btn">Delete</button>
+    </form>
+    {% endif %}
+  </div>
+  {% empty %}
+  <p class="muted">No comments yet.</p>
+  {% endfor %}
+</section>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ owner.username }} · Tidepool{% endblock %}
+{% block content %}
+<section class="profile-head">
+  {% include "network/_avatar.html" with u=owner size="xl" %}
+  <div class="profile-info">
+    <div class="profile-row">
+      <h1>{{ owner.username }}</h1>
+      {% if owner == user %}
+        <a class="btn btn-quiet" href="{% url 'profile_edit' %}">Edit profile</a>
+      {% else %}
+        {% include "network/_follow_button.html" with person=owner is_following=is_following %}
+      {% endif %}
+    </div>
+    {% if owner.profile.bio %}<p>{{ owner.profile.bio }}</p>{% endif %}
+    <p class="muted meta">
+      {% if owner.profile.location %}<span>{{ owner.profile.location }}</span>{% endif %}
+      {% if owner.profile.website %}<a href="{{ owner.profile.website }}" rel="nofollow noopener" target="_blank">{{ owner.profile.website }}</a>{% endif %}
+      <span>Joined {{ owner.date_joined|date:"F Y" }}</span>
+    </p>
+    <p class="stats">
+      <span><strong>{{ post_count }}</strong> posts</span>
+      <a href="{% url 'followers' owner.username %}"><strong data-follower-count>{{ followers_count }}</strong> followers</a>
+      <a href="{% url 'following' owner.username %}"><strong>{{ following_count }}</strong> following</a>
+    </p>
+  </div>
+</section>
+
+{% for post in posts %}
+  {% include "network/_post.html" %}
+{% empty %}
+  <div class="empty"><p>{{ owner.username }} hasn't posted yet.</p></div>
+{% endfor %}
+
+{% include "network/_pager.html" %}
+{% endblock %}

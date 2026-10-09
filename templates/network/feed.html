@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Home · Tidepool{% endblock %}
+{% block content %}
+<header class="page-head">
+  <h1>Home</h1>
+  {% if user.is_authenticated %}
+  <div class="tabs" role="tablist">
+    <a href="?tab=following" class="{% if tab == 'following' %}is-active{% endif %}">Following</a>
+    <a href="?tab=everyone" class="{% if tab == 'everyone' %}is-active{% endif %}">Everyone</a>
+  </div>
+  {% endif %}
+</header>
+
+{% if user.is_authenticated %}
+<form class="composer" method="post" action="{% url 'post_create' %}" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% include "network/_avatar.html" with u=user size="md" %}
+  <div class="composer-main">
+    <label class="sr-only" for="{{ form.content.id_for_label }}">Post</label>
+    {{ form.content }}
+    <div class="composer-bar">
+      <label class="file-pick">
+        <span>Add image</span>
+        {{ form.image }}
+      </label>
+      <span class="file-name muted" data-file-name></span>
+      <span class="muted counter" data-counter="{{ form.content.id_for_label }}">500</span>
+      <button type="submit" class="btn btn-primary">Post</button>
+    </div>
+  </div>
+</form>
+{% else %}
+<div class="notice">
+  <p><strong>Join Tidepool.</strong> Sign up to post, comment, like and follow people.</p>
+  <a class="btn btn-primary" href="{% url 'register' %}">Create account</a>
+</div>
+{% endif %}
+
+{% for post in posts %}
+  {% include "network/_post.html" %}
+{% empty %}
+  <div class="empty">
+    {% if tab == 'following' %}
+      <p>Your feed is empty. Post something, or follow people from <em>Who to follow</em>.</p>
+      <a class="btn btn-quiet" href="?tab=everyone">See everyone's posts</a>
+    {% else %}
+      <p>No posts yet. Be the first to post.</p>
+    {% endif %}
+  </div>
+{% endfor %}
+
+{% include "network/_pager.html" %}
+{% endblock %}

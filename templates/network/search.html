@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Search · Tidepool{% endblock %}
+{% block content %}
+<header class="page-head"><h1>Search</h1></header>
+<form class="search search-page" action="{% url 'search' %}" method="get" role="search">
+  <input type="search" name="q" value="{{ q }}" placeholder="Search people and posts" aria-label="Search" autofocus>
+  <button class="btn btn-primary" type="submit">Search</button>
+</form>
+
+{% if q %}
+  <h2 class="section-title">People</h2>
+  {% for person in people %}
+    {% include "network/_user_card.html" %}
+  {% empty %}
+    <p class="muted pad">No people match "{{ q }}".</p>
+  {% endfor %}
+
+  <h2 class="section-title">Posts</h2>
+  {% for post in posts %}
+    {% include "network/_post.html" %}
+  {% empty %}
+    <p class="muted pad">No posts match "{{ q }}".</p>
+  {% endfor %}
+{% else %}
+  <div class="empty"><p>Type a name or a word to search.</p></div>
+{% endif %}
+{% endblock %}
